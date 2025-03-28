@@ -156,7 +156,9 @@ function p3(x,y,z){
 function tick(){
 tick1()
 }
-
+function onPlayerClick(id,alt){
+	onPlayerClick1(id,alt)
+}
 function sound1(id){
 api.playSound(id, "submachine_tail_only_shot_01",1, 1)
 }
@@ -174,20 +176,22 @@ function onBlockStand(id){
 	api.setPlayerPose(id, "standing")
 }
 /*tools = [["Moonstone Axe",1],["Stone Hoe",1],["Wood Hang Glider",1], ["Arrow of Knockback",1],["Splash Instant Healing potion II",1], ["Splash Instant Healing potion II",1], ["Splash Instant Healing potion II",1], ["Splash Instant Healing potion II",1], ["Splash Instant Healing potion II",1]]*/
-tools = [["Moonstone Axe",1],["Stone Hoe",1],["Iron Hang Glider",1], ["Obby RPG",1],["Steak",20],["Gold Spade",1],["Gold Spade",1],["Gold Spade",1],["Gold Spade",1],["Gold Spade",1]]
+tools = [["Moonstone Axe",1],["Moonstone Fragment",1],["Iron Hang Glider",1], ["Obby RPG",1],["Stone Hoe",1],["Steak",20],["Gold Spade",1],["Gold Spade",1],["Gold Spade",1],["Gold Spade",1]]
 
 function onPlayerJoin(id){
 	cooldown[id]=0
 	heights[id] = 0
 
-	api.applyEffect(id, "Slowness", null, {icon:"Slowness",displayName:"Stunned",inbuiltLevel:1})
+	api.applyEffect(id, "Slowness", null, {icon:"Slowness",displayName:"Stunned",inbuiltLevel:2})
 	for (i=0;i<tools.length;i++){
 		if (tools[i][0]==="Moonstone Axe"){
 		api.setItemSlot(id, i, tools[i][0], tools[i][1], {"customDisplayName": "The Mace", "customDescription": "The higher you fall, the more the damage. Enchantment: Wind burst"})
 		}else if (tools[i][0]==="Stone Hoe"){
 			api.setItemSlot(id, i, tools[i][0], tools[i][1], {"customDisplayName": "The Lifesteal Scynth", "customDescription": "Steal Hearts from others by attacking them!"})
-		}else if (tools[i][0]==="Gold Shovel"){
+		}else if (tools[i][0]==="Gold Spade"){
 			api.setItemSlot(id, i, tools[i][0], tools[i][1], {"customDisplayName": "Extra Life", "customDescription": "With a Twist!"})
+		}else if (tools[i][0]==="Moonstone Fragment"){
+			api.setItemSlot(id, i, tools[i][0], tools[i][1], {"customDisplayName": "Downdraft", "customDescription": "Get Down FAST!"})
 		}else{
 			api.setItemSlot(id, i, tools[i][0],tools[i][1])
 		}
@@ -196,7 +200,7 @@ function onPlayerJoin(id){
 	api.setItemSlot(id, 47, "Diamond Chestplate", null);
 	api.setItemSlot(id, 48, "Diamond Gauntlets", null);
 	api.setItemSlot(id, 49, "Diamond Leggings", null);
-	api.setItemSlot(id, 50, "Diamond boots", null);
+	api.setItemSlot(id, 50, "Diamond Boots", null);
 	
 }
 function onPlayerAltAction1(id){
