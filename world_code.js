@@ -172,13 +172,17 @@ function onPlayerDamagingOtherPlayer(id, id1, dmg, item){
 	onPlayerDamagingOtherPlayer1(id, id1, dmg, item)
 }
 function onBlockStand(id){
-	heights[id] = api.getPosition(id)[1]
-	api.setPlayerPose(id, "standing")
+	onBlockStand1(id)
 }
 /*tools = [["Moonstone Axe",1],["Stone Hoe",1],["Wood Hang Glider",1], ["Arrow of Knockback",1],["Splash Instant Healing potion II",1], ["Splash Instant Healing potion II",1], ["Splash Instant Healing potion II",1], ["Splash Instant Healing potion II",1], ["Splash Instant Healing potion II",1]]*/
-tools = [["Moonstone Axe",1],["Moonstone Fragment",1],["Iron Hang Glider",1], ["Obby RPG",1],["Stone Hoe",1],["Steak",20],["Gold Spade",1],["Gold Spade",1],["Gold Spade",1],["Gold Spade",1]]
+tools = [["Moonstone Axe",1],["Moonstone Fragment",1],["Iron Hang Glider",1], 
+["Obby RPG",1],["Stone Hoe",1],["Steak",20],["Gold Spade",1],["Gold Spade",1],["Gold Spade",1],["Gold Spade",1]]
 
 function onPlayerJoin(id){
+	players = api.getPlayerIds()
+	if (players.length > 12){
+		api.kickPlayer(id, "Sorry, Lobby is full! Please wait...")
+	}
 	cooldown[id]=0
 	heights[id] = 0
 
@@ -201,25 +205,5 @@ function onPlayerJoin(id){
 	api.setItemSlot(id, 48, "Diamond Gauntlets", null);
 	api.setItemSlot(id, 49, "Diamond Leggings", null);
 	api.setItemSlot(id, 50, "Diamond Boots", null);
-	
-}
-function onPlayerAltAction1(id){
-	slotidx= api.getSelectedInventorySlotI(id)
-	itm = api.getItemSlot(id, slotidx)
-	if (itm.attributes.customDisplayName==="Fireworks"){
-		
-
-		api.setplayerpose(id, "gliding")
-		C=30
-		cam_info = api.getplayerFacingInfo(id)
-		cooldownF[id]=5
-		/*for (i=1000;i>0;i--){
-			api.setVelocity(id, cam_info.dir[0]*C,cam_info.dir[1]*C,cam_info.dir[2]*C)
-		}*/
-		api.setVelocity(id, cam_info.dir[0]*C,cam_info.dir[1]*C,cam_info.dir[2]*C)
-		api.removeItemName(id, itm.name, 1)
-		/*api.broadcastMessage(api.getplayerFacingInfo(id))*/
-		
-	}
 	
 }
