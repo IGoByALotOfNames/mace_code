@@ -25,12 +25,27 @@ cooldown=[]
 cooldownL=[]
 cooldownF=[]
 cooldownU=[]
+combo=[]
 heights=[]
+playerMeta = []
 function tick1(){
 cnt+=1
 players=api.getPlayerIds()
 for (i=0;i<players.length;i++){
-	new_pos = api.getPosi\u{74}ion(players[i])[1]
+	playerMeta[players[i]]=  {"pos":api.getPosi\u{74}ion(players[i]), "killStreak":api.getCurrentKillstreak(players[i])}
+	new_pos = playerMeta[players[i]].pos[1]
+	if (cooldownU[players[i]] > 0){
+		cooldownU[players[i]]-=1
+		/*api.applyEffect(players[i], "Slowness", null, {icon:"Slowness",displayName:"Stunned",inbuiltLevel:1})*/
+		
+		if (new_pos > heights[players[i]]){
+            /*api.broadcastMessage(api.getBlockTypesPlayerStandingOn(players[i]).length.toString())*/
+			
+			api.setPosition(players[i], api.getPosi\u{74}ion(players[i])[0],heights[players[i]],api.getPosi\u{74}ion(players[i])[2])
+			
+	
+		}
+	}
 	if ( new_pos > heights[players[i]]){
 		/*api.broadca\u{73}tMessage(new_pos.toString())*/
 		heights[players[i]] = new_pos
@@ -48,17 +63,7 @@ for (i=0;i<players.length;i++){
 	
 
 	}
-	if (cooldownU[players[i]] > 0){
-		cooldownU[players[i]]-=1
-		/*api.applyEffect(players[i], "Slowness", null, {icon:"Slowness",displayName:"Stunned",inbuiltLevel:1})*/
-		if (api.getBlockTypesPlayerStandingOn(players[i]).length > 0){
-            /*api.broadcastMessage(api.getBlockTypesPlayerStandingOn(players[i]).length.toString())*/
-			
-			api.applyImpulse(players[i], 0,-20,0)
-			
-	
-		}
-	}/*else{
+	/*else{
         api.applyEffect(players[i], "Slowness", null, {icon:"Slowness",displayName:"Stunned",inbuiltLevel:2})
     }*/
 	/*if (cnt % 1===0){
@@ -80,44 +85,17 @@ function soun(id){
 api.playSound(id, "submachine_tail_only_shot_01",1, 1)
 }
 function onPlayerKilledOtherPlayer1(id,id1){
-	slotidx= api.getSelectedInventorySlotI(id)
-	i\u{74}m = api.get\u{49}temSlot(id, slotidx)
-	pos_1 = api.getposi\u{74}ion(id1)
-	if (i\u{74}m.name==="Gold Spade"){
-
-		api.forceRespawn(id1, pos1[0], pos1[1], pos1[2])
-		api.playSound(id, "ca\u{73}hRegister",1, 1)
-		api.playSound(id1, "ca\u{73}hRegister",1, 1)
-		p3(pos1[0], pos1[1], pos1[2])
-		
-
-	}else{
-		for (i=0;i<tools.length;i++){
-			if (tools[i][0]==="Moonstone Axe"){
-			api.set\u{49}temSlot(id, i, tools[i][0], tools[i][1], {"customDisplayName": "The Mace", "customDescription": "The higher you fall, the more the damage. Enchantment: Wind burst"})
-			}else if (tools[i][0]==="Stone Hoe"){
-				api.set\u{49}temSlot(id, i, tools[i][0], tools[i][1], {"customDisplayName": "The Lifesteal Scynth", "customDescription": "Steal Hearts from others by attacking them!"})
-			}else if (tools[i][0]==="Gold Spade"){
-				api.set\u{49}temSlot(id, i, tools[i][0], tools[i][1], {"customDisplayName": "Extra Life", "customDescription": "Wi\u{74}h a Twist!"})
-			}else{
-				api.set\u{49}temSlot(id, i, tools[i][0],tools[i][1])
-			}
-		}
-	api.set\u{49}temSlot(id, 46, "Diamond Helmet", null);
-	api.set\u{49}temSlot(id, 47, "Diamond Chestplate", null);
-	api.set\u{49}temSlot(id, 48, "Diamond Gauntlets", null);
-	api.set\u{49}temSlot(id, 49, "Diamond Leggings", null);
-	api.set\u{49}temSlot(id, 50, "Diamond boots", null);
+	api.log(id,id1, api.getEffects(id1))
 	
-}
-
+	api.forceRespawn(id1, positions[id1])
 	
 	return "keepInventory"
 }
 function onPlayerDamagingOtherPlayer1(id, id1, dmg, i\u{74}em){
-	tth = pa\u{72}seInt(heights[id]-api.getPosi\u{74}ion(id)[1])
+	tth = pa\u{72}seInt(Math.abs(heights[id]-api.getPosi\u{74}ion(id)[1]))
 	poser = api.getPosi\u{74}ion(id1)
-	if (i\u{74}em==="Moonstone Axe" && cooldown[id] === 0 && tth>1.5){
+	api.removeEffect(id, "Mace Combo")
+	if (i\u{74}em==="Moonstone Axe" && cooldown[id] === 0 && tth>3){
 		api.setVeloci\u{74}y(id, 0,10,0)
 		api.setVeloci\u{74}y(id, 0,18,0)
 		api.setVeloci\u{74}y(id1, 0,10,0)
@@ -129,30 +107,30 @@ function onPlayerDamagingOtherPlayer1(id, id1, dmg, i\u{74}em){
 
 
 			
-			chaneH = -(8*tth)
+			chaneH = -(10*tth)
 
 			
 		}else if (tth < 7){
-			chaneH = -(4*tth)
+			chaneH = -(7*tth)
 
 		}else{
-			chaneH = -(1*tth)
+			chaneH = -(3*tth)
 
 		}
-		slotidx= api.getSelectedInventorySlotI(id1)
-		i\u{74}m = api.get\u{49}temSlot(id, slotidx)
+		combo[id]+=1
 		
-		if (api.getHealth(id1) >0){
-			api.applyHealthChange(id1, chaneH,id)
-			p1(poser[0],poser[1],poser[2])
-		}else if(api.getHealth(id1) < 0 && (i\u{74}m.name==="Gold Spade")){
-			
-			api.removeI\u{74}emName(id1, "Gold Spade", 1)
+		api.applyEffect(id, "Mace Combo", null, {displayName:"x"+combo[id]+" Mace Chain", icon:"Moonstone Axe"})
+		if (api.getHealth(id1)+chaneH < 5 && api.getEffects(id1).includes("Extra Life")){
 			api.setHealth(id1, 10)
 			api.applyEffect(id1, "Health Regen", 40000, {inbuiltLevel:2})
 			api.setShieldAmount(id1, 20)
 			api.playSound(id1, "ca\u{73}hRegister",1, 1)
+			api.applyEffect(id1, "Extra Life", 1, {displayName: "Extra Life", icon:"Gold Spade"})
 			p3(poser[0],poser[1],poser[2])	
+		}else{
+			api.applyHealthChange(id1, chaneH,id)
+			p1(poser[0],poser[1],poser[2])
+
 		}
 		cooldownU[id1]=2*20
 		api.applyEffect(id1,"Unflyable",2000,{icon:"Cobweb"})
@@ -162,13 +140,23 @@ function onPlayerDamagingOtherPlayer1(id, id1, dmg, i\u{74}em){
 	}
 	
     if (i\u{74}em==="Stone Hoe" && cooldownL[id] === 0){
-		api.playSound(id, "sweep6",1, 1)
-		api.playSound(id1, "sweep6",1, 1)
-		api.applyHealthChange(id1, -dmg ,id)
-		api.applyHealthChange(id, dmg*2, id1)
-		p2(poser[0],poser[1],poser[2])
+		if (api.getHealth(id1)-dmg < 5 && api.getEffects(id1).includes("Extra Life")){
+			api.setHealth(id1, 10)
+			api.applyEffect(id1, "Health Regen", 25000, {inbuiltLevel:2})
+			api.setShieldAmount(id1, 20)
+			api.playSound(id1, "ca\u{73}hRegister",1, 1)
+			api.applyEffect(id1, "Extra Life", 1, {displayName: "Extra Life", icon:"Gold Spade"})
+			p3(poser[0],poser[1],poser[2])	
+		}else{
+			api.playSound(id, "sweep6",1, 1)
+			api.playSound(id1, "sweep6",1, 1)
+			api.applyHealthChange(id1, -dmg ,id)
+			api.applyHealthChange(id, dmg*2, id1)
+			p2(poser[0],poser[1],poser[2])
+		}
 	}
-	heights[id] = api.getPosi\u{74}ion(id)
+	
+	/*heights[id] = api.getPosi\u{74}ion(id)*/
     cooldown[id]=2
 	cooldownL[id]=8
 	cooldownF[id]=0
@@ -177,44 +165,33 @@ function onPlayerDamagingOtherPlayer1(id, id1, dmg, i\u{74}em){
 function onPlayerDamagingMob1(id, id1, dmg, i\u{74}em){
 	tth = pa\u{72}seInt(heights[id]-api.getPosi\u{74}ion(id)[1])
 	poser = api.getPosi\u{74}ion(id1)
+	api.removeEffect(id, "Mace Combo")
 	if (i\u{74}em==="Moonstone Axe" && cooldown[id] === 0 && tth>1.5){
 		api.setVeloci\u{74}y(id, 0,10,0)
 		api.setVeloci\u{74}y(id, 0,18,0)
 		api.setVeloci\u{74}y(id1, 0,10,0)
 		
-		soun(id1)
 		soun(id)
 		/*api.applyEffect(id1, "Frozen", 1000, {icon:"Slowness",displayName:"Stunned",inbuiltLevel:2})*/
 		if (tth < 4){
 
 
 			
-			chaneH = -(8*tth)
+			chaneH = -(10*tth)
 
 			
 		}else if (tth < 7){
-			chaneH = -(4*tth)
+			chaneH = -(7*tth)
 
 		}else{
-			chaneH = -(1*tth)
+			chaneH = -(3*tth)
 
 		}
-		slotidx= api.getSelectedInventorySlotI(id1)
-		i\u{74}m = api.get\u{49}temSlot(id, slotidx)
+		combo[id]+=1
 		
-		if (api.getHealth(id1) >0){
-			api.applyHealthChange(id1, chaneH,id)
-			p1(poser[0],poser[1],poser[2])
-		}else if(api.getHealth(id1) < 0 && (i\u{74}m.name==="Gold Spade")){
-			
-			api.removeI\u{74}emName(id1, "Gold Spade", 1)
-			api.setHealth(id1, 10)
-			api.applyEffect(id1, "Health Regen", 40000, {inbuiltLevel:2})
-			api.setShieldAmount(id1, 20)
-			api.playSound(id1, "ca\u{73}hRegister",1, 1)
-			p3(poser[0],poser[1],poser[2])	
-		}
+		api.applyEffect(id, "Mace Combo", null, {displayName:"x"+combo[id]+" Mace Chain", icon:"Moonstone Axe"})
 		cooldownU[id1]=2*20
+		cooldown[id]=2
 		api.applyEffect(id1,"Unflyable",2000,{icon:"Cobweb"})
 		
 	}else if (cooldown[id] > 0){
@@ -223,28 +200,36 @@ function onPlayerDamagingMob1(id, id1, dmg, i\u{74}em){
 	
     if (i\u{74}em==="Stone Hoe" && cooldownL[id] === 0){
 		api.playSound(id, "sweep6",1, 1)
-		api.playSound(id1, "sweep6",1, 1)
 		api.applyHealthChange(id1, -dmg ,id)
 		api.applyHealthChange(id, dmg*2, id1)
 		p2(poser[0],poser[1],poser[2])
+		
+		cooldownL[id]=8
 	}
-	heights[id] = api.getPosi\u{74}ion(id)
-    cooldown[id]=2
-	cooldownL[id]=8
+	/*heights[id] = api.getPosi\u{74}ion(id)*/
 	cooldownF[id]=0
 
 }
-function onblockStand1(id){
-	heights[id] = api.getposi\u{74}ion(id)[1]
+function onBlockStand1(id){
+	heights[id] = api.getPosi\u{74}ion(id)[1]
+	combo[id] = 0
 	api.setPlayerPose(id, "standing")
 }
-function onPlayerClick1(id){
+function onPlayerClick1(id,alt){
 	
 	slotidx= api.getSelectedInventorySlotI(id)
 	i\u{74}m = api.get\u{49}temSlot(id, slotidx)
 	/*api.broadcastMessage(itm)*/
-	if (i\u{74}m.name==="Moonstone Fragment"){
+	
+	if (i\u{74}m !== null){
+	if (i\u{74}m.attributes.customDisplayName==="Downdraft"){
 		api.setVelocity(id, 0,-20,0)
+	}
+	if (i\u{74}m.attributes.customDisplayName==="Extra Life" && alt && !api.getEffects(id).includes("Extra Life")){
+		api.applyEffect(id, "Extra Life", null, {displayName: "Extra Life", icon:"Gold Spade"})
+		/*api.removeI\u{74}emName(id, "Gold Spade", 1)*/
+		api.setItemSlot(id, slotidx, "Gold Spade", 0)
+	}
 	}
 }
 /*tools = [["Moonstone Axe",1],["Stone Hoe",1],["Wood Hang Glider",1], ["Arrow of Knockback",1],["Spla\u{73}h Instant Healing potion II",1], ["Spla\u{73}h Instant Healing potion II",1], ["Spla\u{73}h Instant Healing potion II",1], ["Spla\u{73}h Instant Healing potion II",1], ["Spla\u{73}h Instant Healing potion II",1]]*/
@@ -270,7 +255,7 @@ function onPlayerJoin1(id){
 	api.set\u{49}temSlot(id, 47, "Diamond Chestplate", null);
 	api.set\u{49}temSlot(id, 48, "Diamond Gauntlets", null);
 	api.set\u{49}temSlot(id, 49, "Diamond Leggings", null);
-	api.set\u{49}temSlot(id, 50, "Diamond boots", null);
+	api.set\u{49}temSlot(id, 50, "Diamond Boots", null);
 	
 }
 function onPlayerAltAction1(id){
